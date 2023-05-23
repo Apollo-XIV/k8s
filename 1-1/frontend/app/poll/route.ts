@@ -16,3 +16,4 @@ export async function GET() {
     if (outcome == "FAILURE") {return new Response("lost")};
     return new Response(outcome=='bar' ? "healthy" : "degraded");
 }
+
