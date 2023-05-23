@@ -1,5 +1,4 @@
 'use client'
-import Image from 'next/image'
 import { useEffect, useState } from 'react'
 
 export default function Main() {
@@ -10,35 +9,45 @@ export default function Main() {
 
   const [health, setHealth] = useState("Unknown");
   const [status, setStatus] = useState("None");
-  let bgstyle="black";
+  const [bgstyle, setBgStyle] = useState("black");
 
-
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setStatus("Polling...");
+      fetch("/poll")
+        .then((response) => {
+          return response.text();
+        })
+        .then((data) => {
+          setStatus("Response received.")
+          setHealth(data);
+        })
+    }, 5000);
+    return () => clearInterval(interval);
+  }, [])
 
   
 
   useEffect(() => {
+    console.log("I RAN")
     if (health == "healthy") {
-      bgstyle="green";
+      setBgStyle("#5F8D4E");
     } else if (health == "Unknown") {
-      bgstyle="black";
+      setBgStyle("black");
     } else {
-      bgstyle="red";
+      setBgStyle("red");
     }
   },[health]);
 
 
 
   return (<>
-<div className="fixed inset-0 m-0 flex justify-center items-center" style={{backgroundColor: bgstyle}}>
+  <div className="fixed inset-0 m-0 flex justify-center items-center" style={{backgroundColor: bgstyle}}>
     <div id="center" className='font-bold uppercase'>
       <h1 className='text-4xl'>Connection: {health}</h1>
       <p>Status: {status}</p>
-      
+      <p>V.0.1</p>
     </div>
   </div>
-  
-  
-  
-  
   </>)
 }
