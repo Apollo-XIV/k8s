@@ -1,0 +1,36 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: rat
+
+---
+apiVersion: v1
+kind: Pod
+metadata:
+  name: webapp
+  namespace: rat
+  labels:
+    name: webapp
+spec:
+  containers:
+  - name: web
+    image: nginx:1.22-alpine
+    ports:
+    - containerPort: 3005
+    volumeMounts:
+      - name: shared
+        mountPath: /etc/nginx/templates
+    env:
+      - name: NGINX_PORT
+        value: "3005"
+  initContainers:
+    - name: web-init
+      image: busybox:1.28
+      command: ['sh','-c','echo -e "server {\n\tlisten\t\${NGINX_PORT};\n\n\tlocation / {\n\t\troot\t/usr/share/nginx/html;\n\t}\n}" > /tempdir/default.conf.template']
+      volumeMounts:
+        - name: shared
+          mountPath: /tempdir
+  volumes:
+    - name: shared
+      emptyDir: {}
+        
